@@ -1,8 +1,6 @@
 {
   "proxies": [
-    "https://raw.githubusercontent.com/yourusername/stealth-data/main/proxy1",
-    "https://raw.githubusercontent.com/yourusername/stealth-data/main/proxy2",
-    "https://gitlab.com/yourusername/stealth-proxy/-/raw/main/proxy3"
+    "https://github.com/BSXLAbS2025/stealth-proxy.github.io/",
   ],
   "backup_proxies": [
     "https://raw.githubusercontent.com/anotheruser/mirror/main/data",
