@@ -2,308 +2,451 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Secure Access</title>
+    <title>Secure Browser</title>
     <style>
-        body { font-family: Arial; max-width: 900px; margin: 0 auto; padding: 20px; }
-        .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        #urlInput { width: 70%; padding: 10px; margin-right: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        #fetchBtn { padding: 10px 20px; background: #007cba; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        #result { margin-top: 20px; border: 1px solid #ddd; padding: 15px; border-radius: 5px; min-height: 400px; }
-        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
+        body { font-family: Arial; max-width: 1000px; margin: 0 auto; padding: 20px; background: #f0f0f0; }
+        .container { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 20px; }
+        .url-section { display: flex; gap: 10px; margin-bottom: 20px; }
+        #urlInput { flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
+        #fetchBtn { padding: 12px 25px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        #fetchBtn:hover { background: #218838; }
+        #fetchBtn:disabled { background: #6c757d; cursor: not-allowed; }
+        .result-section { margin-top: 20px; }
+        #result { border: 2px solid #e9ecef; padding: 20px; border-radius: 8px; min-height: 500px; background: #f8f9fa; }
+        .status { padding: 12px; margin: 15px 0; border-radius: 8px; font-weight: bold; }
+        .success { background: #d1edff; color: #004085; border: 1px solid #b8daff; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
         .hidden { display: none; }
-        .proxy-list { margin: 10px 0; font-size: 12px; color: #666; }
+        .examples { background: #fff3cd; padding: 15px; border-radius: 8px; margin: 15px 0; }
+        .example-btn { background: #ffc107; border: none; padding: 8px 15px; margin: 5px; border-radius: 5px; cursor: pointer; }
+        .example-btn:hover { background: #e0a800; }
+        .tab { overflow: hidden; border: 1px solid #ccc; background: #f1f1f1; border-radius: 8px 8px 0 0; }
+        .tab button { background: inherit; float: left; border: none; outline: none; cursor: pointer; padding: 14px 16px; transition: 0.3s; }
+        .tab button:hover { background: #ddd; }
+        .tab button.active { background: #007bff; color: white; }
+        .tabcontent { display: none; padding: 20px; border: 1px solid #ccc; border-top: none; border-radius: 0 0 8px 8px; }
+        textarea { width: 100%; height: 300px; font-family: monospace; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        iframe { width: 100%; height: 500px; border: 1px solid #ddd; border-radius: 5px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔒 Secure Web Access</h1>
-        
-        <div class="status hidden" id="status"></div>
-        
-        <div>
+        <div class="header">
+            <h1>🌐 Secure Web Browser</h1>
+            <p>Доступ к интернету через безопасные методы</p>
+        </div>
+
+        <div class="status info">
+            💡 <strong>Как использовать:</strong> Введите URL сайта или выберите пример ниже
+        </div>
+
+        <div class="url-section">
             <input type="url" id="urlInput" placeholder="https://example.com" value="https://httpbin.org/ip">
             <button id="fetchBtn">Получить данные</button>
         </div>
 
-        <div class="proxy-list">
-            <strong>Доступные прокси:</strong>
-            <div id="proxyStatus">Проверяем прокси...</div>
+        <div class="examples">
+            <strong>Примеры для тестирования:</strong><br>
+            <button class="example-btn" data-url="https://httpbin.org/ip">IP информация</button>
+            <button class="example-btn" data-url="https://api.github.com">GitHub API</button>
+            <button class="example-btn" data-url="https://jsonplaceholder.typicode.com/posts/1">JSON тест</button>
+            <button class="example-btn" data-url="https://news.ycombinator.com">Hacker News</button>
+            <button class="example-btn" data-url="https://textise.net">Textise (обход блокировок)</button>
         </div>
-        
-        <div id="result">
-            <p>Введите URL и нажмите "Получить данные"</p>
-            <p><strong>Тестовые URL:</strong></p>
-            <ul>
-                <li><a href="#" class="test-url">https://httpbin.org/ip</a></li>
-                <li><a href="#" class="test-url">https://api.github.com</a></li>
-                <li><a href="#" class="test-url">https://jsonplaceholder.typicode.com/posts/1</a></li>
-            </ul>
+
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'Preview')">Просмотр</button>
+            <button class="tablinks" onclick="openTab(event, 'HTML')">HTML код</button>
+            <button class="tablinks" onclick="openTab(event, 'Text')">Текст</button>
+            <button class="tablinks" onclick="openTab(event, 'JSON')">JSON</button>
+        </div>
+
+        <div class="result-section">
+            <div id="result">
+                <div style="text-align: center; padding: 50px;">
+                    <h3>👆 Введите URL выше</h3>
+                    <p>Результат появится здесь</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="status info" style="margin-top: 20px;">
+            🔒 <strong>Безопасность:</strong> Все запросы выполняются через ваш браузер. 
+            Мы не храним и не передаем ваши данные.
         </div>
     </div>
 
     <script>
-        class WorkingStealthClient {
+        class StealthBrowser {
             constructor() {
-                this.workingProxies = [];
-                this.currentProxyIndex = 0;
+                this.currentMethod = 'iframe';
+                this.retryCount = 0;
+                this.maxRetries = 2;
             }
 
-            // Список публичных CORS прокси
-            getProxies() {
-                return [
-                    {
-                        name: 'Cors Proxy',
-                        url: 'https://corsproxy.io/?',
-                        type: 'cors'
-                    },
-                    {
-                        name: 'CodeTabs Proxy', 
-                        url: 'https://api.codetabs.com/v1/proxy?quest=',
-                        type: 'cors'
-                    },
-                    {
-                        name: 'AllOrigins',
-                        url: 'https://api.allorigins.win/get?url=',
-                        type: 'allorigins'
-                    },
-                    {
-                        name: 'GitHub Raw',
-                        url: 'https://raw.githubusercontent.com/BSXLAbS2025/stealth-proxy/main/proxy.html',
-                        type: 'github'
-                    }
-                ];
-            }
-
-            showStatus(message, type) {
-                const statusEl = document.getElementById('status');
+            showStatus(message, type = 'info') {
+                // Создаем или находим элемент статуса
+                let statusEl = document.getElementById('status');
+                if (!statusEl) {
+                    statusEl = document.createElement('div');
+                    statusEl.id = 'status';
+                    document.querySelector('.header').after(statusEl);
+                }
+                
                 statusEl.textContent = message;
                 statusEl.className = `status ${type}`;
                 statusEl.classList.remove('hidden');
-                setTimeout(() => statusEl.classList.add('hidden'), 4000);
+                
+                setTimeout(() => {
+                    statusEl.classList.add('hidden');
+                }, 5000);
             }
 
-            // Тестируем прокси
-            async testProxies() {
-                const testUrl = 'https://httpbin.org/ip';
-                const proxies = this.getProxies();
-                this.workingProxies = [];
-
-                for (let proxy of proxies) {
-                    try {
-                        this.showStatus(`Проверяем ${proxy.name}...`, 'success');
-                        
-                        if (proxy.type === 'cors') {
-                            const response = await fetch(proxy.url + encodeURIComponent(testUrl), {
-                                method: 'GET',
-                                headers: {
-                                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-                                }
-                            });
-                            
-                            if (response.ok) {
-                                const data = await response.json();
-                                if (data.origin) {
-                                    this.workingProxies.push(proxy);
-                                    console.log(`✅ ${proxy.name} работает`);
-                                }
-                            }
-                        }
-                    } catch (error) {
-                        console.log(`❌ ${proxy.name} не работает:`, error);
-                    }
-                }
-
-                // Обновляем статус прокси
-                const proxyStatus = document.getElementById('proxyStatus');
-                if (this.workingProxies.length > 0) {
-                    proxyStatus.innerHTML = `✅ Рабочих прокси: ${this.workingProxies.length}`;
-                    this.showStatus(`Найдено ${this.workingProxies.length} рабочих прокси`, 'success');
-                } else {
-                    proxyStatus.innerHTML = '❌ Нет рабочих прокси';
-                    this.showStatus('Нет рабочих прокси, используем прямой запрос', 'error');
-                }
-            }
-
-            async fetchUrl(targetUrl) {
-                // Сначала пробуем CORS прокси
-                for (let proxy of this.workingProxies) {
-                    try {
-                        this.showStatus(`Используем ${proxy.name}...`, 'success');
-                        
-                        if (proxy.type === 'cors') {
-                            const response = await fetch(proxy.url + encodeURIComponent(targetUrl), {
-                                headers: {
-                                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                                    'Accept': 'application/json,text/html,*/*'
-                                }
-                            });
-                            
-                            if (response.ok) {
-                                const contentType = response.headers.get('content-type');
-                                
-                                if (contentType && contentType.includes('application/json')) {
-                                    return await response.json();
-                                } else {
-                                    return await response.text();
-                                }
-                            }
-                        }
-                    } catch (error) {
-                        console.log(`Прокси ${proxy.name} не сработал:`, error);
-                    }
-                }
-
-                // Если CORS прокси не работают, пробуем iframe метод
-                return await this.fetchViaIframe(targetUrl);
-            }
-
-            // Метод через iframe для обхода CORS
-            fetchViaIframe(targetUrl) {
+            // Метод 1: Iframe для HTML контента
+            loadInIframe(url) {
                 return new Promise((resolve, reject) => {
-                    const iframe = document.createElement('iframe');
-                    iframe.style.display = 'none';
-                    iframe.srcdoc = `
-                        <!DOCTYPE html>
-                        <html>
-                        <head>
-                            <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"><\/script>
-                        </head>
-                        <body>
-                            <script>
-                                axios.get('${targetUrl}')
-                                    .then(response => {
-                                        window.parent.postMessage({
-                                            type: 'IFRAME_RESPONSE',
-                                            data: response.data,
-                                            success: true
-                                        }, '*');
-                                    })
-                                    .catch(error => {
-                                        window.parent.postMessage({
-                                            type: 'IFRAME_RESPONSE', 
-                                            error: error.message,
-                                            success: false
-                                        }, '*');
-                                    });
-                            <\/script>
-                        </body>
-                        </html>
+                    const resultDiv = document.getElementById('result');
+                    
+                    // Показываем iframe
+                    resultDiv.innerHTML = `
+                        <div class="status info">
+                            📄 Загружаем страницу в безопасном режиме...
+                        </div>
+                        <iframe src="${url}" id="contentFrame"></iframe>
+                        <div style="margin-top: 10px;">
+                            <button onclick="switchToText()" class="example-btn">Показать как текст</button>
+                        </div>
                     `;
                     
-                    const messageHandler = (event) => {
-                        if (event.data.type === 'IFRAME_RESPONSE') {
-                            window.removeEventListener('message', messageHandler);
-                            document.body.removeChild(iframe);
-                            
-                            if (event.data.success) {
-                                resolve(event.data.data);
-                            } else {
-                                reject(new Error(event.data.error));
-                            }
-                        }
-                    };
-                    
-                    window.addEventListener('message', messageHandler);
-                    document.body.appendChild(iframe);
+                    resolve({ type: 'iframe', url: url });
                 });
             }
 
-            // Простой GET запрос без прокси (для тестирования)
-            async directFetch(targetUrl) {
+            // Метод 2: Fetch через сервисы Google Apps Script
+            async fetchViaGoogleAppsScript(url) {
                 try {
-                    // Создаем изображение для теста (обход CORS)
-                    if (targetUrl.includes('httpbin.org/ip')) {
-                        return await fetch('https://httpbin.org/ip').then(r => r.json());
-                    }
+                    // Это пример - нужно создать свой Google Apps Script
+                    const scriptUrls = [
+                        'https://script.google.com/macros/s/AKfycbzEXAMPLE/exec',
+                        'https://script.google.com/macros/s/AKfycbzEXAMPLE2/exec'
+                    ];
                     
-                    // Для других URL используем iframe
-                    return await this.fetchViaIframe(targetUrl);
+                    for (let scriptUrl of scriptUrls) {
+                        try {
+                            const response = await fetch(`${scriptUrl}?url=${encodeURIComponent(url)}`);
+                            if (response.ok) {
+                                const data = await response.text();
+                                return { type: 'text', data: data };
+                            }
+                        } catch (e) {
+                            console.log('Google Apps Script failed:', e);
+                        }
+                    }
+                    throw new Error('Google Apps Script не доступен');
                 } catch (error) {
                     throw error;
                 }
             }
+
+            // Метод 3: JSONP для API запросов
+            fetchViaJSONP(url) {
+                return new Promise((resolve, reject) => {
+                    if (!url.includes('json')) {
+                        reject(new Error('JSONP работает только с JSON API'));
+                        return;
+                    }
+
+                    const callbackName = 'jsonp_callback_' + Date.now();
+                    const script = document.createElement('script');
+                    
+                    window[callbackName] = function(data) {
+                        delete window[callbackName];
+                        document.body.removeChild(script);
+                        resolve({ type: 'json', data: data });
+                    };
+
+                    script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + callbackName;
+                    document.body.appendChild(script);
+                    
+                    setTimeout(() => {
+                        if (window[callbackName]) {
+                            delete window[callbackName];
+                            document.body.removeChild(script);
+                            reject(new Error('JSONP timeout'));
+                        }
+                    }, 10000);
+                });
+            }
+
+            // Метод 4: Form submission для POST запросов
+            fetchViaForm(url, method = 'GET') {
+                return new Promise((resolve) => {
+                    const form = document.createElement('form');
+                    form.method = method;
+                    form.action = url;
+                    form.target = 'formTarget';
+                    
+                    const iframe = document.createElement('iframe');
+                    iframe.name = 'formTarget';
+                    iframe.style.display = 'none';
+                    
+                    document.body.appendChild(iframe);
+                    document.body.appendChild(form);
+                    
+                    // Для GET просто отправляем
+                    if (method === 'GET') {
+                        form.submit();
+                    }
+                    
+                    // Ждем загрузки iframe
+                    iframe.onload = function() {
+                        try {
+                            const content = iframe.contentDocument.body.innerHTML;
+                            resolve({ type: 'html', data: content });
+                        } catch (e) {
+                            resolve({ type: 'html', data: 'Content loaded' });
+                        }
+                    };
+                    
+                    setTimeout(() => {
+                        resolve({ type: 'html', data: 'Form submitted' });
+                    }, 5000);
+                });
+            }
+
+            // Основной метод загрузки
+            async loadUrl(url) {
+                this.showStatus('🔄 Начинаем загрузку...', 'info');
+                
+                try {
+                    // Определяем тип контента по URL
+                    if (url.includes('.json') || url.includes('/api/')) {
+                        // JSON данные
+                        try {
+                            return await this.fetchViaJSONP(url);
+                        } catch (e) {
+                            return await this.loadInIframe(url);
+                        }
+                    } else if (url.includes('httpbin.org') || url.includes('github.com')) {
+                        // API endpoints
+                        try {
+                            return await this.fetchViaJSONP(url);
+                        } catch (e) {
+                            return await this.loadInIframe(url);
+                        }
+                    } else {
+                        // HTML страницы
+                        return await this.loadInIframe(url);
+                    }
+                } catch (error) {
+                    this.retryCount++;
+                    if (this.retryCount <= this.maxRetries) {
+                        this.showStatus(`🔄 Повторная попытка ${this.retryCount}/${this.maxRetries}...`, 'info');
+                        return await this.loadUrl(url);
+                    } else {
+                        throw error;
+                    }
+                }
+            }
+
+            // Отображение результата
+            displayResult(result, url) {
+                const resultDiv = document.getElementById('result');
+                
+                switch (result.type) {
+                    case 'iframe':
+                        resultDiv.innerHTML = `
+                            <div class="status success">
+                                ✅ Страница загружена в безопасном режиме
+                            </div>
+                            <iframe src="${url}" id="contentFrame"></iframe>
+                            <div style="margin-top: 10px;">
+                                <button onclick="showPageSource('${url}')" class="example-btn">
+                                    Показать исходный код
+                                </button>
+                                <button onclick="switchToTextMode('${url}')" class="example-btn">
+                                    Текстовый режим
+                                </button>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'json':
+                        resultDiv.innerHTML = `
+                            <div class="status success">
+                                ✅ JSON данные получены
+                            </div>
+                            <h4>Данные от ${url}:</h4>
+                            <pre><code>${JSON.stringify(result.data, null, 2)}</code></pre>
+                        `;
+                        break;
+                        
+                    case 'text':
+                        resultDiv.innerHTML = `
+                            <div class="status success">
+                                ✅ Текст получен
+                            </div>
+                            <h4>Содержимое:</h4>
+                            <textarea readonly>${result.data}</textarea>
+                        `;
+                        break;
+                        
+                    case 'html':
+                        resultDiv.innerHTML = `
+                            <div class="status success">
+                                ✅ HTML получен
+                            </div>
+                            <h4>Исходный код:</h4>
+                            <textarea readonly>${result.data}</textarea>
+                        `;
+                        break;
+                }
+                
+                this.retryCount = 0;
+            }
+        }
+
+        // Глобальные функции для кнопок
+        function showPageSource(url) {
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('result').innerHTML = `
+                        <div class="status info">
+                            📝 Исходный код страницы
+                        </div>
+                        <textarea readonly>${html}</textarea>
+                    `;
+                })
+                .catch(error => {
+                    document.getElementById('result').innerHTML = `
+                        <div class="status error">
+                            ❌ Ошибка загрузки исходного кода: ${error.message}
+                        </div>
+                    `;
+                });
+        }
+
+        function switchToTextMode(url) {
+            fetch(url)
+                .then(response => response.text())
+                .then(text => {
+                    // Удаляем теги для чистого текста
+                    const cleanText = text.replace(/<[^>]*>/g, '');
+                    document.getElementById('result').innerHTML = `
+                        <div class="status info">
+                            📄 Текстовое представление
+                        </div>
+                        <textarea readonly>${cleanText}</textarea>
+                    `;
+                })
+                .catch(error => {
+                    document.getElementById('result').innerHTML = `
+                        <div class="status error">
+                            ❌ Ошибка: ${error.message}
+                        </div>
+                    `;
+                });
+        }
+
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName("tabcontent");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            
+            const tablinks = document.getElementsByClassName("tablinks");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
         }
 
         // Инициализация
-        document.addEventListener('DOMContentLoaded', async function() {
-            const client = new WorkingStealthClient();
-            
-            // Тестируем прокси при загрузке
-            await client.testProxies();
-            
-            // Обработчик кнопки
-            document.getElementById('fetchBtn').addEventListener('click', async function() {
-                const url = document.getElementById('urlInput').value.trim();
-                const resultDiv = document.getElementById('result');
+        document.addEventListener('DOMContentLoaded', function() {
+            const browser = new StealthBrowser();
+            const fetchBtn = document.getElementById('fetchBtn');
+            const urlInput = document.getElementById('urlInput');
+
+            // Обработчик основной кнопки
+            fetchBtn.addEventListener('click', async function() {
+                const url = urlInput.value.trim();
                 
                 if (!url) {
-                    client.showStatus('Введите URL', 'error');
+                    browser.showStatus('❌ Введите URL', 'error');
+                    return;
+                }
+
+                if (!url.startsWith('http')) {
+                    browser.showStatus('❌ URL должен начинаться с http:// или https://', 'error');
                     return;
                 }
 
                 try {
-                    client.showStatus('Загружаем данные...', 'success');
-                    resultDiv.innerHTML = '<p>Загрузка...</p>';
+                    fetchBtn.disabled = true;
+                    fetchBtn.textContent = 'Загрузка...';
                     
-                    let result;
+                    browser.showStatus('🔄 Загружаем данные...', 'info');
                     
-                    // Если есть рабочие прокси, используем их
-                    if (client.workingProxies.length > 0) {
-                        result = await client.fetchUrl(url);
-                    } else {
-                        // Иначе пробуем прямой запрос
-                        result = await client.directFetch(url);
-                    }
+                    const result = await browser.loadUrl(url);
+                    browser.displayResult(result, url);
                     
-                    // Отображаем результат
-                    if (typeof result === 'string') {
-                        resultDiv.innerHTML = `
-                            <h3>Результат:</h3>
-                            <pre>${result}</pre>
-                        `;
-                    } else {
-                        resultDiv.innerHTML = `
-                            <h3>Результат:</h3>
-                            <pre>${JSON.stringify(result, null, 2)}</pre>
-                        `;
-                    }
-                    
-                    client.showStatus('Данные получены успешно!', 'success');
+                    browser.showStatus('✅ Данные успешно загружены!', 'success');
                     
                 } catch (error) {
                     console.error('Error:', error);
-                    resultDiv.innerHTML = `
-                        <div style="color: red;">
-                            <h3>Ошибка:</h3>
-                            <p>${error.message}</p>
-                            <p><strong>Советы:</strong></p>
+                    document.getElementById('result').innerHTML = `
+                        <div class="status error">
+                            ❌ Ошибка загрузки: ${error.message}
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <h4>Что можно сделать:</h4>
                             <ul>
-                                <li>Попробуйте другой URL</li>
-                                <li>Убедитесь что URL начинается с https://</li>
-                                <li>Обновите страницу и попробуйте снова</li>
+                                <li>Проверьте правильность URL</li>
+                                <li>Попробуйте другой сайт</li>
+                                <li>Убедитесь что сайт доступен</li>
+                                <li>Попробуйте обновить страницу</li>
                             </ul>
                         </div>
                     `;
-                    client.showStatus('Ошибка получения данных', 'error');
+                    browser.showStatus('❌ Ошибка загрузки', 'error');
+                } finally {
+                    fetchBtn.disabled = false;
+                    fetchBtn.textContent = 'Получить данные';
                 }
             });
 
-            // Тестовые URL
-            document.querySelectorAll('.test-url').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    document.getElementById('urlInput').value = this.textContent;
-                    document.getElementById('fetchBtn').click();
+            // Обработчики примеров
+            document.querySelectorAll('.example-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const url = this.getAttribute('data-url');
+                    urlInput.value = url;
+                    fetchBtn.click();
                 });
             });
 
-            // Поддержка Enter
-            document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            // Enter для отправки
+            urlInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
-                    document.getElementById('fetchBtn').click();
+                    fetchBtn.click();
                 }
+            });
+
+            // Создаем tab content
+            const resultDiv = document.getElementById('result');
+            const tabs = ['Preview', 'HTML', 'Text', 'JSON'];
+            
+            tabs.forEach(tab => {
+                const tabContent = document.createElement('div');
+                tabContent.id = tab;
+                tabContent.className = 'tabcontent';
+                tabContent.style.display = tab === 'Preview' ? 'block' : 'none';
+                tabContent.innerHTML = '<p>Содержимое будет здесь</p>';
+                resultDiv.appendChild(tabContent);
             });
         });
     </script>
