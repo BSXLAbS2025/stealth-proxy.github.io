@@ -1,12 +1,5 @@
 {
-  "proxies": [
-    "https://bsxlab-s2025.github.io/stealth-proxy/proxy",
-    "https://raw.githubusercontent.com/BSXLAbS2025/stealth-proxy/main/proxy.html",
-    "https://bsxlab-s2025.github.io/stealth-proxy/proxy.html"
-  ],
-  "backup_proxies": [
-    "https://cdn.jsdelivr.net/gh/BSXLAbS2025/stealth-proxy@main/proxy.html",
-    "https://raw.githack.com/BSXLAbS2025/stealth-proxy/main/proxy.html"
-  ],
-  "version": "2.0"
+  "version": "3.0",
+  "status": "active",
+  "message": "Stealth Proxy System"
 }
