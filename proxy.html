@@ -4,33 +4,6 @@
     <title>Proxy</title>
 </head>
 <body>
-    <script>
-        async function handleProxy() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const encodedUrl = urlParams.get('url');
-            
-            if (!encodedUrl) {
-                document.body.innerHTML = 'No URL parameter';
-                return;
-            }
-
-            try {
-                const targetUrl = atob(encodedUrl);
-                console.log('Fetching:', targetUrl);
-                
-                const response = await fetch(targetUrl);
-                const text = await response.text();
-                
-                // Возвращаем результат
-                document.body.innerHTML = `<pre>${JSON.stringify({success: true, data: text}, null, 2)}</pre>`;
-                
-            } catch (error) {
-                document.body.innerHTML = `<pre>${JSON.stringify({error: error.message}, null, 2)}</pre>`;
-            }
-        }
-
-        // Запускаем при загрузке
-        handleProxy();
-    </script>
+    Proxy endpoint
 </body>
 </html>
