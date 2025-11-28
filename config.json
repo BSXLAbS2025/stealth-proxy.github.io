@@ -1,5 +1,7 @@
 {
-  "version": "3.0",
-  "status": "active",
-  "message": "Stealth Proxy System"
+  "name": "Stealth Browser",
+  "version": "4.0",
+  "description": "Secure web access through multiple methods",
+  "methods": ["iframe", "jsonp", "form", "google_scripts"],
+  "status": "active"
 }
